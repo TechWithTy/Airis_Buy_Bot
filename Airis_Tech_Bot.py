@@ -71,7 +71,7 @@ def random_time():
 
 
 def checkout_function():
-
+    
     random_time()
 
     buy_now = check_exists_by_xpath(
@@ -83,7 +83,8 @@ def checkout_function():
     last_name_data = get_env_variable("last_name")
     street_address_data = get_env_variable("street_address")
     city_data = get_env_variable("city")
-    State_data = get_env_variable("state")
+    state_data_short = get_env_variable("state_short")
+    state_data_long = get_env_variable("state_long")
     zip_code_data = get_env_variable("zip_code")
     phone_number_data = get_env_variable("phone_number")
     email_data = get_env_variable("email")
@@ -132,7 +133,12 @@ def checkout_function():
     random_time()
     state_field = find_element_by_xpath(
         '//*[@id="checkout_shipping_address_province"]')
-    Select(state_field).select_by_value('CO')
+# Try seperate state codes
+    try:
+        Select(state_field).select_by_value(state_data_short)
+    except Exception as e:
+        Select(state_field).select_by_value(state_data_long)
+
 
     random_time()
     continue_shopping = check_exists_by_xpath('//*[@id="continue_button"]')
