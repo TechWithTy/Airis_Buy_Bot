@@ -3,7 +3,7 @@ import random
 import time
 import traceback
 from threading import Timer
-
+import re
 import chromedriver_binary
 from dotenv import load_dotenv
 from pushbullet import Pushbullet
@@ -89,6 +89,7 @@ def checkout_function():
     phone_number_data = get_env_variable("phone_number")
     email_data = get_env_variable("email")
 
+
     random_time()
     first_name_field = check_exists_by_xpath(
         '//*[@id="checkout_shipping_address_first_name"]')
@@ -158,21 +159,39 @@ def checkout_function():
     complete_order.click()
 
     def input_credit_info():
+        def split_cc_num(n):
+            return  re.findall(r"(\d{4}|\d{1,3}$)", str(n))
+
+        def split_my_num(n):
+            return re.findall(r"(\d{2}|\d{1,3}$)", str(n))
+
+        
+        cc_num = split_cc_num(get_env_variable("cc_num"))
+        mm_yy = split_my_num(get_env_variable("mm_yy"))
+        cvc = get_env_variable("cvc")
         WebDriverWait(wd, 20).until(EC.frame_to_be_available_and_switch_to_it(
             (By.XPATH, '//*[@id="win-cc-pay-frame"]')))
-        cc_num = check_exists_by_xpath('//*[@id="cc-number"]')
-        MM_YY = check_exists_by_xpath('//*[@id="cc-exp"]')
-        CVC = check_exists_by_xpath('//*[@id="cc-cvc"]')
-        type(cc_num)
-        cc_num.send_keys('2234')
-        cc_num.send_keys('2234')
-        cc_num.send_keys('2234')
-        cc_num.send_keys('2234')
-        type(MM_YY)
-        MM_YY.send_keys(12)
-        MM_YY.send_keys(52)
-        type(CVC)
-        CVC.send_keys(CVC_CODE)
+        cc_num_field = check_exists_by_xpath('//*[@id="cc-number"]')
+        MM_YY_field = check_exists_by_xpath('//*[@id="cc-exp"]')
+        cvc_field = check_exists_by_xpath('//*[@id="cc-cvc"]')
+        pay_button = check_exists_by_xpath('//*[@id="checkout-btn"]')
+        type(cc_num_field)
+        print(mm_yy)
+        for x in cc_num:
+           cc_num_field.send_keys(x)
+       
+        type(MM_YY_field)
+        for x in  mm_yy:
+           MM_YY_field.send_keys(x)
+        
+        type(cvc_field)
+        cvc_field.send_keys(cvc)
+       
+        pay_button.click()
+        time.sleep(5)
+        if pay_button:
+            push_message('Could not make purchase','Airis Headbanger')
+            print('Could not make purchase', 'Airis Headbanger')
     input_credit_info()
 
 
