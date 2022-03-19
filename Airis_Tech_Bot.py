@@ -14,6 +14,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
+from urllib.parse import urlparse
+
+
 
 load_dotenv()
 options = Options()
@@ -21,8 +24,9 @@ options.add_argument('--headless')
 options.add_argument('--disable-gpu')  # Last I checked this was necessary.
 
 pb = Pushbullet('o.WbZBGDdGdZagX82oLtB2Ei3YmFzQzmsx')
-
-website_product_not_available = "https://airistechshop.com/products/headbanger-dab-coil?_pos=2&_sid=a658e6223&_ss=r"
+production = "https://airistechshop.com/products/headbanger-dip-coil?_pos=2&_sid=692c02fe3&_ss=r"
+website_name = urlparse(production).netloc
+website_product_not_available = "https://airistechshop.com/products/headbanger-dip-coil?_pos=2&_sid=692c02fe3&_ss=r"
 website_product_available = "https://airistechshop.com/collections/promote/products/airis-janus-vaporizer"
 
 wd = wd.Chrome()
@@ -30,14 +34,14 @@ wd = wd.Chrome()
 
 def open_webpage():
     wd.implicitly_wait(10)
-    wd.get(website_product_available)
+    wd.get(production)
 
 
 open_webpage()
 
 
 def push_message(title, message):
-    push = pb.push_note(title, message)
+    push = pb.push_note(website_name + title, message)
 
 
 size = "W 10.5 / M 9"
@@ -47,9 +51,13 @@ def check_exists_by_xpath(xpath):
     try:
         return wd.find_element_by_xpath(xpath)
     except Exception as e:
+        wd.save_screenshot("ElementUnavailable.png")
+        with open("ElementUnavailable.png", "rb") as pic:
+            file_data = pb.upload_file(pic, "picture.jpg")
+            pb.push_file(**file_data)
         push_message("Airis: Element was not able to be found", xpath)
         return False
-    return True
+    
 
 
 def get_env_variable(var):
@@ -192,6 +200,9 @@ def checkout_function():
         if pay_button:
             push_message('Could not make purchase','Airis Headbanger')
             print('Could not make purchase', 'Airis Headbanger')
+        else:
+            push_message('Purchase Made', 'Airis Headbanger')
+
     input_credit_info()
 
 
