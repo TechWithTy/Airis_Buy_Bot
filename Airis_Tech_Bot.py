@@ -1,18 +1,21 @@
-from selenium import webdriver as wd
-import chromedriver_binary
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import Select
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import time
+import os
 import random
-from threading import Timer
-from selenium.common.exceptions import NoSuchElementException
-from pushbullet import Pushbullet
+import time
 import traceback
-from selenium.webdriver.chrome.options import Options
+from threading import Timer
 
+import chromedriver_binary
+from dotenv import load_dotenv
+from pushbullet import Pushbullet
+from selenium import webdriver as wd
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select, WebDriverWait
+
+load_dotenv()
 options = Options()
 options.add_argument('--headless')
 options.add_argument('--disable-gpu')  # Last I checked this was necessary.
@@ -22,7 +25,7 @@ pb = Pushbullet('o.WbZBGDdGdZagX82oLtB2Ei3YmFzQzmsx')
 website_product_not_available = "https://airistechshop.com/products/headbanger-dab-coil?_pos=2&_sid=a658e6223&_ss=r"
 website_product_available = "https://airistechshop.com/collections/promote/products/airis-janus-vaporizer"
 
-wd = wd.Chrome(chrome_options=options)
+wd = wd.Chrome()
 
 
 def open_webpage():
@@ -49,6 +52,10 @@ def check_exists_by_xpath(xpath):
     return True
 
 
+def get_env_variable(var):
+    return os.environ.get(var)
+
+
 def find_element_by_text(string):
     return wd.find_element_by_xpath(str('//*[text()="{}"]'.format(string)))
 
@@ -72,57 +79,60 @@ def checkout_function():
     buy_now.click()
     random_time()
 
-    first_name = 'Tyrique'
-    last_name = 'Daniel'
-    street_address = '3860 red deer trail'
-    city = 'broomfield'
-    State = 'Co'
-    zip_code = '80020'
-    phone_number = '3054330078'
-    email = 'Tyriquedaniel4@gmail.com'
+    first_name_data = get_env_variable("first_name")
+    last_name_data = get_env_variable("last_name")
+    street_address_data = get_env_variable("street_address")
+    city_data = get_env_variable("city")
+    State_data = get_env_variable("state")
+    zip_code_data = get_env_variable("zip_code")
+    phone_number_data = get_env_variable("phone_number")
+    email_data = get_env_variable("email")
 
     random_time()
-    first_name = check_exists_by_xpath(
+    first_name_field = check_exists_by_xpath(
         '//*[@id="checkout_shipping_address_first_name"]')
-    type(first_name)
-    first_name.send_keys('Tyrique')
+    type(first_name_field)
+    first_name_field.send_keys(first_name_data)
 
     random_time()
-    last_name = check_exists_by_xpath(
+    last_name_field = check_exists_by_xpath(
         '//*[@id="checkout_shipping_address_last_name"]')
-    type(last_name)
-    last_name.send_keys('Daniel')
+    type(last_name_field)
+    last_name_field.send_keys(last_name_data)
 
     random_time()
-    address = check_exists_by_xpath(
+    street_address_field = check_exists_by_xpath(
         '//*[@id="checkout_shipping_address_address1"]')
-    type(address)
-    address.send_keys('3860 red deer trail')
+    type(street_address_field)
+    street_address_field.send_keys(street_address_data)
 
     random_time()
-    city = check_exists_by_xpath('//*[@id="checkout_shipping_address_city"]')
-    type(city)
-    city.send_keys('Broomfield')
+    city_field = check_exists_by_xpath(
+        '//*[@id="checkout_shipping_address_city"]')
+    type(city_field)
+    city_field.send_keys(city_data)
 
     random_time()
-    zipcode = check_exists_by_xpath('//*[@id="checkout_shipping_address_zip"]')
-    type(zipcode)
-    zipcode.send_keys('80020')
+    zipcode_field = check_exists_by_xpath(
+        '//*[@id="checkout_shipping_address_zip"]')
+    type(zipcode_field)
+    zipcode_field.send_keys(zip_code_data)
 
     random_time()
-    phone = check_exists_by_xpath('//*[@id="checkout_shipping_address_phone"]')
-    type(phone)
-    phone.send_keys('3054330078')
+    phone_field = check_exists_by_xpath(
+        '//*[@id="checkout_shipping_address_phone"]')
+    type(phone_field)
+    phone_field.send_keys(phone_number_data)
 
     random_time()
-    email = check_exists_by_xpath('//*[@id="checkout_email"]')
-    type(email)
-    email.send_keys('Tyriquedaniel4@gmail.com')
+    email_field = check_exists_by_xpath('//*[@id="checkout_email"]')
+    type(email_field)
+    email_field.send_keys(email_data)
 
     random_time()
-    state = find_element_by_xpath(
+    state_field = find_element_by_xpath(
         '//*[@id="checkout_shipping_address_province"]')
-    Select(state).select_by_value('CO')
+    Select(state_field).select_by_value('CO')
 
     random_time()
     continue_shopping = check_exists_by_xpath('//*[@id="continue_button"]')
